@@ -14,80 +14,17 @@ var Schema = `
 		# Name string
 		# Platform Platform
         # Release string
-		# Container Container
-		# Packages []Package
-        # Errors   []string
-        # Optional [][]interface{}
 		
-		scanInfo(id: ID!): ScanInfo
-		# ScannedAt time.Time
-		# JSONVersion string
-		# Lang string 
-		# ServerInfo ServerInfo
-		# vulnInfos []vulnInfo
+		#		scanInfo(id: ID!): ScanInfo
+		#		# ScannedAt time.Time
+		#		# JSONVersion string
+		#		# Lang string 
+		#		# ServerInfo ServerInfo
+		#		# vulnInfos []vulnInfo
+		#
+		#		vulnInfo(cveID: String!): VulnInfo
+		#        # CveID string
 
-		vulnInfo(cveID: String!): VulnInfo
-        # CveID string
-        # Confidence Confidence
-        # Packages []Package
-        # DistroAdvisories []DistroAdvisories
-        # Cpes []Cpe
-        # CveContents CveContents
-
-		package(name: String!): Package
-        # Name string
-        # Version string
-        # Release string
-        # NewVersion string
-        # NewRelease string
-        # Repository string
-        # Changelog Changelog
-        # NotFixedYet bool
-
-        platform(name: String): Platform
-		# Name string
-		# InstanceID string
-
-		container(containerID: String): Container
-		# ContainerID: string
-		# Name string
-		# Image string
-		# Type string
-
-		confidence(score: Int): Confidence
-		# Score int
-		# DetectionMethod string
-
-		distroAdvisory(advisoryID: String): DistroAdvisory
-		# AdvisoryID string
-		# Severity string
-		# Issued time.Time
-		# Updated time.Time
-
-		cveContent(cveID: String): CveContent
-		# Type string
-		# CveID string
-		# title string
-		# Summary string
-        # Severity string
-        # Cvss2Score float64
-        # Cvss2Vector string
-        # Cvss3Score float64
-        # Cvss3Vector string
-        # SourceLink string
-        # Cpes []Cpe
-        # References References
-        # CweID string
-        # Published  time.Time
-        # LastModified time.Time
-		
-		reference(refID: String): Reference
-		# RefID string
-		# Source string
-		# Link string
-
-		cpe(name: String): Cpe
-		# name string
 
 	}
 	# The mutation type, represents all updates we can make to our data
@@ -212,105 +149,35 @@ var Schema = `
     	name: String
     	release: String
     	platform: Platform
-    	container: Container
-    	packages: [Package]
     }
-    type ScanInfo {
-		id: ID!
-    	scannedAt  : String
-    	jsonVersion: String
-    	lang       : String
-    	serverInfo : [ServerInfo]
-    	vulnInfos  : [VulnInfo]
-    	errors     : [String]
-    	optional   : [String]
-    }
+	#    type ScanInfo {
+	#		id: ID!
+	#    	scannedAt  : String
+	#    	jsonVersion: String
+	#    	lang       : String
+	#    	serverInfo : [ServerInfo]
+	#    }
+	#
 
-
-    type Container {
-		containerID: String
-    	name       : String
-    	image      : String
-    	type       : String
-    }
-    
-    
     type Platform {
 		name      : String 
     	instanceID: String
     }
     
-    type VulnInfo {
-		cveID           : String
-    	confidence      : Confidence
-    	packageNames    : [String]
-    	distroAdvisories: [DistroAdvisory]
-    	cpeNames        : [String]
-    	cveContents     : [CveContent]
-    }
+	# type VulnInfo {
+   	# 	cveID           : String
+   	# 	confidence      : Confidence
+   	# 	packageNames    : [String]
+   	# 	distroAdvisories: [DistroAdvisory]
+   	# 	cpeNames        : [String]
+   	# 	cveContents     : [CveContent]
+   	# }
+	enum PlatformName {
+		AWS
+		GCP	
+		Sakura	
+	}
     
-    
-    
-    type Confidence {
-		score          : Int
-    	detectionMethod: String
-    }
-    
-    
-    type DistroAdvisory {
-		advisoryID: String
-    	severity  : String
-    	issued    : String
-    	updated   : String
-    }
-    
-    type CveContent {
-		type        : String
-    	cveID       : String
-    	title       : String
-    	summary     : String
-    	severity    : String
-    	cvss2Score  : Float
-    	cvss2Vector : String
-    	cvss3Score  : Float
-    	cvss3Vector : String
-    	sourceLink  : String
-    	cpes        : [Cpe]
-    	references  : [Reference]
-    	cweID       : String
-    	published   : String
-    	lastModified: String
-    }
-    
-    
-    type Reference {
-		source: String
-    	link  : String
-    	refID : String
-    }
-    
-    
-    type Cpe {
-		cpeName: String
-    }
-    
-    type Package {
-		name       : String
-    	version    : String
-    	release    : String
-    	newVersion : String
-    	newRelease : String
-    	repository : String
-    	changelog  : Changelog
-    	notFixedYet: Boolean
-    }
-    
-    
-    
-    type Changelog {
-		Contents: String
-    	Method  : String
-    }
 `
 
 // ScanInfo vuls sacn result
@@ -318,7 +185,7 @@ type ScanInfo struct {
 	ScannedAt   time.Time
 	JSONVersion string
 	Lang        string
-	ServerInfo  []ServerInfo
+	ServerInfo  []serverInfo
 	VulnInfos   []VulnInfo
 	Errors      []string
 	Optional    []string

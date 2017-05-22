@@ -5,18 +5,15 @@ import (
 	"net/http"
 
 	"./starwars"
-	"./vuls"
 	"github.com/neelance/graphql-go"
 	"github.com/neelance/graphql-go/relay"
 )
 
 var schema *graphql.Schema
-var schema2 *graphql.Schema
 
 func init() {
 	var err error
 	schema, err = graphql.ParseSchema(starwars.Schema, &starwars.Resolver{})
-	schema2, err = graphql.ParseSchema(vuls.Schema, &vuls.Resolver{})
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +25,7 @@ func main() {
 	}))
 
 	//	http.Handle("/query", &relay.Handler{Schema: schema})
-	http.Handle("/query", &relay.Handler{Schema: schema2})
+	http.Handle("/query", &relay.Handler{Schema: schema})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

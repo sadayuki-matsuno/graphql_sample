@@ -289,74 +289,74 @@ var reviews = make(map[string][]*review)
 type Resolver struct{}
 
 // Hero : hero
-func (r *Resolver) Hero(args *struct{ Episode string }) *CharacterResolver {
+func (r *Resolver) Hero(args *struct{ Episode string }) jcharacterResolver {
 	if args.Episode == "EMPIRE" {
-		return &CharacterResolver{&HumanResolver{humanData["1000"]}}
+		return &characterResolver{&humanResolver{humanData["1000"]}}
 	}
-	return &CharacterResolver{&DroidResolver{droidData["2001"]}}
+	return &characterResolver{&droidResolver{droidData["2001"]}}
 }
 
 // Reviews : reviews
-func (r *Resolver) Reviews(args *struct{ Episode string }) []*ReviewResolver {
-	var l []*ReviewResolver
+func (r *Resolver) Reviews(args *struct{ Episode string }) []*reviewResolver {
+	var l []*reviewResolver
 	for _, review := range reviews[args.Episode] {
-		l = append(l, &ReviewResolver{review})
+		l = append(l, &reviewResolver{review})
 	}
 	return l
 }
 
 // Search : search
-func (r *Resolver) Search(args *struct{ Text string }) []*SearchResultResolver {
-	var l []*SearchResultResolver
+func (r *Resolver) Search(args *struct{ Text string }) []*searchResultResolver {
+	var l []*searchResultResolver
 	for _, h := range humans {
 		if strings.Contains(h.Name, args.Text) {
-			l = append(l, &SearchResultResolver{&HumanResolver{h}})
+			l = append(l, &searchResultResolver{&humanResolver{h}})
 		}
 	}
 	for _, d := range droids {
 		if strings.Contains(d.Name, args.Text) {
-			l = append(l, &SearchResultResolver{&DroidResolver{d}})
+			l = append(l, &searchResultResolver{&droidResolver{d}})
 		}
 	}
 	for _, s := range starships {
 		if strings.Contains(s.Name, args.Text) {
-			l = append(l, &SearchResultResolver{&StarshipResolver{s}})
+			l = append(l, &searchResultResolver{&starshipResolver{s}})
 		}
 	}
 	return l
 }
 
 // Character : character
-func (r *Resolver) Character(args *struct{ ID graphql.ID }) *CharacterResolver {
+func (r *Resolver) Character(args *struct{ ID graphql.ID }) *characterResolver {
 	if h := humanData[args.ID]; h != nil {
-		return &CharacterResolver{&HumanResolver{h}}
+		return &characterResolver{&humanResolver{h}}
 	}
 	if d := droidData[args.ID]; d != nil {
-		return &CharacterResolver{&DroidResolver{d}}
+		return &characterResolver{&droidResolver{d}}
 	}
 	return nil
 }
 
 // Human : human
-func (r *Resolver) Human(args *struct{ ID graphql.ID }) *HumanResolver {
+func (r *Resolver) Human(args *struct{ ID graphql.ID }) *humanResolver {
 	if h := humanData[args.ID]; h != nil {
-		return &HumanResolver{h}
+		return &humanResolver{h}
 	}
 	return nil
 }
 
 // Droid : droid
-func (r *Resolver) Droid(args *struct{ ID graphql.ID }) *DroidResolver {
+func (r *Resolver) Droid(args *struct{ ID graphql.ID }) *droidResolver {
 	if d := droidData[args.ID]; d != nil {
-		return &DroidResolver{d}
+		return &droidResolver{d}
 	}
 	return nil
 }
 
 // Starship : starship
-func (r *Resolver) Starship(args *struct{ ID graphql.ID }) *StarshipResolver {
+func (r *Resolver) Starship(args *struct{ ID graphql.ID }) *starshipResolver {
 	if s := starshipData[args.ID]; s != nil {
-		return &StarshipResolver{s}
+		return &starshipResolver{s}
 	}
 	return nil
 }
@@ -365,13 +365,13 @@ func (r *Resolver) Starship(args *struct{ ID graphql.ID }) *StarshipResolver {
 func (r *Resolver) CreateReview(args *struct {
 	Episode string
 	Review  *reviewInput
-}) *ReviewResolver {
+}) *reviewResolver {
 	review := &review{
 		stars:      args.Review.Stars,
 		commentary: args.Review.Commentary,
 	}
 	reviews[args.Episode] = append(reviews[args.Episode], review)
-	return &ReviewResolver{review}
+	return &reviewResolver{review}
 }
 
 type friendsConenctionArgs struct {
@@ -382,50 +382,48 @@ type friendsConenctionArgs struct {
 type character interface {
 	ID() graphql.ID
 	Name() string
-	Friends() *[]*CharacterResolver
-	FriendsConnection(*friendsConenctionArgs) (*FriendsConnectionResolver, error)
+	Friends() *[]*characterResolver
+	FriendsConnection(*friendsConenctionArgs) (*friendsConnectionResolver, error)
 	AppearsIn() []string
 }
 
-// CharacterResolver : characterResolver
-type CharacterResolver struct {
+type characterResolver struct {
 	character
 }
 
 // ToHuman : to human
-func (r *CharacterResolver) ToHuman() (*HumanResolver, bool) {
-	c, ok := r.character.(*HumanResolver)
+func (r *characterResolver) ToHuman() (*humanResolver, bool) {
+	c, ok := r.character.(*humanResolver)
 	return c, ok
 }
 
 // ToDroid : to droid
-func (r *CharacterResolver) ToDroid() (*DroidResolver, bool) {
-	c, ok := r.character.(*DroidResolver)
+func (r *characterResolver) ToDroid() (*droidResolver, bool) {
+	c, ok := r.character.(*droidResolver)
 	return c, ok
 }
 
-// HumanResolver : HumanResolver
-type HumanResolver struct {
+type humanResolver struct {
 	h *human
 }
 
-// ID : id
-func (r *HumanResolver) ID() graphql.ID {
+// id : id
+func (r *humanResolver) ID() graphql.ID {
 	return r.h.ID
 }
 
-// Name : name
-func (r *HumanResolver) Name() string {
+// name : name
+func (r *humanResolver) Name() string {
 	return r.h.Name
 }
 
 // Height : height
-func (r *HumanResolver) Height(args *struct{ Unit string }) float64 {
+func (r *humanResolver) Height(args *struct{ Unit string }) float64 {
 	return convertLength(r.h.Height, args.Unit)
 }
 
-// Mass : mass
-func (r *HumanResolver) Mass() *float64 {
+// mass : mass
+func (r *humanResolver) Mass() *float64 {
 	if r.h.Mass == 0 {
 		return nil
 	}
@@ -434,107 +432,104 @@ func (r *HumanResolver) Mass() *float64 {
 }
 
 // Friends : friends
-func (r *HumanResolver) Friends() *[]*CharacterResolver {
+func (r *humanResolver) Friends() *[]*characterResolver {
 	return resolveCharacters(r.h.Friends)
 }
 
 // FriendsConnection : friendsConnection
-func (r *HumanResolver) FriendsConnection(args *friendsConenctionArgs) (*FriendsConnectionResolver, error) {
+func (r *humanResolver) FriendsConnection(args *friendsConenctionArgs) (*friendsConnectionResolver, error) {
 	return newFriendsConnectionResolver(r.h.Friends, args)
 }
 
-// AppearsIn : AppearsIn
-func (r *HumanResolver) AppearsIn() []string {
+// appearsIn
+func (r *humanResolver) AppearsIn() []string {
 	return r.h.AppearsIn
 }
 
 // Starships : starships
-func (r *HumanResolver) Starships() *[]*StarshipResolver {
-	l := make([]*StarshipResolver, len(r.h.Starships))
+func (r *humanResolver) Starships() *[]*starshipResolver {
+	l := make([]*starshipResolver, len(r.h.Starships))
 	for i, id := range r.h.Starships {
-		l[i] = &StarshipResolver{starshipData[id]}
+		l[i] = &starshipResolver{starshipData[id]}
 	}
 	return &l
 }
 
-// DroidResolver : DroidResolver
-type DroidResolver struct {
+type droidResolver struct {
 	d *droid
 }
 
 // ID : id
-func (r *DroidResolver) ID() graphql.ID {
+func (r *droidResolver) ID() graphql.ID {
 	return r.d.ID
 }
 
 // Name : name
-func (r *DroidResolver) Name() string {
+func (r *droidResolver) Name() string {
 	return r.d.Name
 }
 
 // Friends : friends
-func (r *DroidResolver) Friends() *[]*CharacterResolver {
+func (r *droidResolver) Friends() *[]*characterResolver {
 	return resolveCharacters(r.d.Friends)
 }
 
 // FriendsConnection : friendsConnection
-func (r *DroidResolver) FriendsConnection(args *friendsConenctionArgs) (*FriendsConnectionResolver, error) {
+func (r *droidResolver) FriendsConnection(args *friendsConenctionArgs) (*friendsConnectionResolver, error) {
 	return newFriendsConnectionResolver(r.d.Friends, args)
 }
 
 // AppearsIn : appearsIn
-func (r *DroidResolver) AppearsIn() []string {
+func (r *droidResolver) AppearsIn() []string {
 	return r.d.AppearsIn
 }
 
 // PrimaryFunction : primaryFunction
-func (r *DroidResolver) PrimaryFunction() *string {
+func (r *droidResolver) PrimaryFunction() *string {
 	if r.d.PrimaryFunction == "" {
 		return nil
 	}
 	return &r.d.PrimaryFunction
 }
 
-// StarshipResolver : StarshipResolver
-type StarshipResolver struct {
+type starshipResolver struct {
 	s *starship
 }
 
 // ID : id
-func (r *StarshipResolver) ID() graphql.ID {
+func (r *starshipResolver) ID() graphql.ID {
 	return r.s.ID
 }
 
 // Name : name
-func (r *StarshipResolver) Name() string {
+func (r *starshipResolver) Name() string {
 	return r.s.Name
 }
 
 // Length : length
-func (r *StarshipResolver) Length(args *struct{ Unit string }) float64 {
+func (r *starshipResolver) Length(args *struct{ Unit string }) float64 {
 	return convertLength(r.s.Length, args.Unit)
 }
 
-// SearchResultResolver : SearchResultResolver
-type SearchResultResolver struct {
+type searchResultResolver struct {
 	result interface{}
 }
 
 // ToHuman : toHuman
-func (r *SearchResultResolver) ToHuman() (*HumanResolver, bool) {
-	res, ok := r.result.(*HumanResolver)
+func (r *searchResultResolver) ToHuman() (*humanResolver, bool) {
+	res, ok := r.result.(*humanResolver)
 	return res, ok
 }
 
 // ToDroid : toDroid
-func (r *SearchResultResolver) ToDroid() (*DroidResolver, bool) {
-	res, ok := r.result.(*DroidResolver)
+func (r *searchResultResolver) ToDroid() (*droidResolver, bool) {
+	res, ok := r.result.(*droidResolver)
 	return res, ok
 }
 
 // ToStarship : toStarship
-func (r *SearchResultResolver) ToStarship() (*StarshipResolver, bool) {
-	res, ok := r.result.(*StarshipResolver)
+func (r *searchResultResolver) ToStarship() (*starshipResolver, bool) {
+	res, ok := r.result.(*starshipResolver)
 	return res, ok
 }
 
@@ -549,8 +544,8 @@ func convertLength(meters float64, unit string) float64 {
 	}
 }
 
-func resolveCharacters(ids []graphql.ID) *[]*CharacterResolver {
-	var characters []*CharacterResolver
+func resolveCharacters(ids []graphql.ID) *[]*characterResolver {
+	var characters []*characterResolver
 	for _, id := range ids {
 		if c := resolveCharacter(id); c != nil {
 			characters = append(characters, c)
@@ -559,39 +554,37 @@ func resolveCharacters(ids []graphql.ID) *[]*CharacterResolver {
 	return &characters
 }
 
-func resolveCharacter(id graphql.ID) *CharacterResolver {
+func resolveCharacter(id graphql.ID) *characterResolver {
 	if h, ok := humanData[id]; ok {
-		return &CharacterResolver{&HumanResolver{h}}
+		return &characterResolver{&humanResolver{h}}
 	}
 	if d, ok := droidData[id]; ok {
-		return &CharacterResolver{&DroidResolver{d}}
+		return &characterResolver{&droidResolver{d}}
 	}
 	return nil
 }
 
-// ReviewResolver : ReviewResolver
-type ReviewResolver struct {
+type reviewResolver struct {
 	r *review
 }
 
 // Stars : stars
-func (r *ReviewResolver) Stars() int32 {
+func (r *reviewResolver) Stars() int32 {
 	return r.r.stars
 }
 
 // Commentary : commentary
-func (r *ReviewResolver) Commentary() *string {
+func (r *reviewResolver) Commentary() *string {
 	return r.r.commentary
 }
 
-// FriendsConnectionResolver : FriendsConnectionResolver
-type FriendsConnectionResolver struct {
+type friendsConnectionResolver struct {
 	ids  []graphql.ID
 	from int
 	to   int
 }
 
-func newFriendsConnectionResolver(ids []graphql.ID, args *friendsConenctionArgs) (*FriendsConnectionResolver, error) {
+func newFriendsConnectionResolver(ids []graphql.ID, args *friendsConenctionArgs) (*friendsConnectionResolver, error) {
 	from := 0
 	if args.After != nil {
 		b, err := base64.StdEncoding.DecodeString(string(*args.After))
@@ -613,7 +606,7 @@ func newFriendsConnectionResolver(ids []graphql.ID, args *friendsConenctionArgs)
 		}
 	}
 
-	return &FriendsConnectionResolver{
+	return &friendsConnectionResolver{
 		ids:  ids,
 		from: from,
 		to:   to,
@@ -621,15 +614,15 @@ func newFriendsConnectionResolver(ids []graphql.ID, args *friendsConenctionArgs)
 }
 
 // TotalCount : totalCount
-func (r *FriendsConnectionResolver) TotalCount() int32 {
+func (r *friendsConnectionResolver) TotalCount() int32 {
 	return int32(len(r.ids))
 }
 
 // Edges : edges
-func (r *FriendsConnectionResolver) Edges() *[]*FriendsEdgeResolver {
-	l := make([]*FriendsEdgeResolver, r.to-r.from)
+func (r *friendsConnectionResolver) Edges() *[]*friendsEdgeResolver {
+	l := make([]*friendsEdgeResolver, r.to-r.from)
 	for i := range l {
-		l[i] = &FriendsEdgeResolver{
+		l[i] = &friendsEdgeResolver{
 			cursor: encodeCursor(r.from + i),
 			id:     r.ids[r.from+i],
 		}
@@ -638,13 +631,13 @@ func (r *FriendsConnectionResolver) Edges() *[]*FriendsEdgeResolver {
 }
 
 // Friends : friends
-func (r *FriendsConnectionResolver) Friends() *[]*CharacterResolver {
+func (r *friendsConnectionResolver) Friends() *[]*characterResolver {
 	return resolveCharacters(r.ids[r.from:r.to])
 }
 
 // PageInfo : pageInfo
-func (r *FriendsConnectionResolver) PageInfo() *PageInfoResolver {
-	return &PageInfoResolver{
+func (r *friendsConnectionResolver) PageInfo() *pageInfoResolver {
+	return &pageInfoResolver{
 		startCursor: encodeCursor(r.from),
 		endCursor:   encodeCursor(r.to - 1),
 		hasNextPage: r.to < len(r.ids),
@@ -655,41 +648,39 @@ func encodeCursor(i int) graphql.ID {
 	return graphql.ID(base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("cursor%d", i+1))))
 }
 
-// FriendsEdgeResolver : FriendsEdgeResolver
-type FriendsEdgeResolver struct {
+type friendsEdgeResolver struct {
 	cursor graphql.ID
 	id     graphql.ID
 }
 
 // Cursor : cursor
-func (r *FriendsEdgeResolver) Cursor() graphql.ID {
+func (r *friendsEdgeResolver) Cursor() graphql.ID {
 	return r.cursor
 }
 
 // Node : node
-func (r *FriendsEdgeResolver) Node() *CharacterResolver {
+func (r *friendsEdgeResolver) Node() *characterResolver {
 	return resolveCharacter(r.id)
 }
 
-// PageInfoResolver : PageInfoResolver
-type PageInfoResolver struct {
+type pageInfoResolver struct {
 	startCursor graphql.ID
 	endCursor   graphql.ID
 	hasNextPage bool
 }
 
 // StartCursor : startCursor
-func (r *PageInfoResolver) StartCursor() *graphql.ID {
+func (r *pageInfoResolver) StartCursor() *graphql.ID {
 	return &r.startCursor
 }
 
 // EndCursor : endCursor
-func (r *PageInfoResolver) EndCursor() *graphql.ID {
+func (r *pageInfoResolver) EndCursor() *graphql.ID {
 	return &r.endCursor
 }
 
 // HasNextPage : hasNextPage
-func (r *PageInfoResolver) HasNextPage() bool {
+func (r *pageInfoResolver) HasNextPage() bool {
 	return r.hasNextPage
 }
 
