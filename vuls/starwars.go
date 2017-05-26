@@ -5,7 +5,6 @@ package vuls
 
 import (
 	"encoding/base64"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -422,10 +421,6 @@ func (r *FriendsConnectionResolver) PageInfo() *PageInfoResolver {
 	}
 }
 
-func encodeCursor(i int) graphql.ID {
-	return graphql.ID(base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("cursor%d", i+1))))
-}
-
 // FriendsEdgeResolver : FriendsEdgeResolver
 type FriendsEdgeResolver struct {
 	cursor graphql.ID
@@ -440,28 +435,6 @@ func (r *FriendsEdgeResolver) Cursor() graphql.ID {
 // Node : node
 func (r *FriendsEdgeResolver) Node() *CharacterResolver {
 	return resolveCharacter(r.id)
-}
-
-// PageInfoResolver : PageInfoResolver
-type PageInfoResolver struct {
-	startCursor graphql.ID
-	endCursor   graphql.ID
-	hasNextPage bool
-}
-
-// StartCursor : startCursor
-func (r *PageInfoResolver) StartCursor() *graphql.ID {
-	return &r.startCursor
-}
-
-// EndCursor : endCursor
-func (r *PageInfoResolver) EndCursor() *graphql.ID {
-	return &r.endCursor
-}
-
-// HasNextPage : hasNextPage
-func (r *PageInfoResolver) HasNextPage() bool {
-	return r.hasNextPage
 }
 
 type reviewInput struct {

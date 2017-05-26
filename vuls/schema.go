@@ -13,7 +13,8 @@ var Schema = `
 		search(text: String!): [SearchResult]!
 		character(id: ID!): Character
 		server(id: ID!): Server
-		cve(cveId: String!): Cve
+		cves(cveIds: [String!]!): [Cve]
+		cveList(cveIds: [String!]!): CveList!
 		human(id: ID!): Human
 		starship(id: ID!): Starship
 	}
@@ -107,6 +108,25 @@ var Schema = `
 		publishedDate: String
 		lastModifiedDate: String
     }
+
+	type CveList {
+		# The total number of friends
+		totalCount: Int!
+		# The edges for each of the character's friends.
+		edges: [CveListEdge]
+		# A list of the friends, as a convenience when edges are not needed.
+		cves: [Cve]
+		# Information for paginating this connection
+		pageInfo: PageInfo!
+	}
+
+	# An edge object for a character's friends
+	type CveListEdge {
+		# A cursor used for pagination
+		cursor: ID!
+		# The character represented by this friendship edge
+		node: Cve
+	}
 
 	# A connection object for a character's friends
 	type FriendsConnection {
