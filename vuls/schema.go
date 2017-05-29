@@ -82,6 +82,7 @@ var Schema = `
 	}
 
 	type Nvd {
+		id: Int!
 		summary: String
 		score: Float
 		accessVector: String
@@ -90,14 +91,17 @@ var Schema = `
 		confidentialityImpact: String
 		integrityImpact: String
 		availabilityImpact: String
+		cpes : [Cpe]
 		cweID: String
+		references: [Reference]
 		publishedDate: String
 	    lastModifiedDate: String
 	}
 
     // Jvn is a model of JVN
     type Jvn {
-		cveDetailID: String
+		id: Int!
+		cveDetailID: Int
 		title  : String
     	summary: String
     	jvnLink: String
@@ -105,6 +109,7 @@ var Schema = `
     	score  :  Float
 		severity: String
     	vector  : String
+		cpes : [Cpe]
 		publishedDate: String
 		lastModifiedDate: String
     }
@@ -126,6 +131,26 @@ var Schema = `
 		cursor: ID!
 		# The character represented by this friendship edge
 		node: Cve
+	}
+
+	type Cpe {
+		jvnID		 	:	Int
+		nvdID 		 	:	Int
+    	cpeName		 	:	String
+    	part         	:	String
+    	vendor       	:	String
+    	product      	:	String
+    	version      	:	String
+    	vendorUpdate 	:	String
+    	edition      	:	String
+    	language     	:	String
+	}
+
+	type Reference {
+		jvnID		: Int
+		nvdID 		: Int
+		source		: String
+		link  		: String
 	}
 
 	# A connection object for a character's friends

@@ -1,0 +1,7 @@
+[postgres]
+dbname  = "saas"
+host =      "0.0.0.0"
+port  = 5432
+user  = "postgres"
+pass  = "vuls"
+sslmode="disable"
