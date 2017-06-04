@@ -1,0 +1,69 @@
+{
+  "serverid": "CVE-2016-7076",
+  "summary": "ApacheStruts における脆弱性",
+  "cve": [
+    {
+      "id": "HighlandAvenue",
+      "limitdate": "2017/08/31",
+      "assign": "Leonor",
+      "status": 2,
+      "score":[
+        { "subject": "AV", "Nvd": 0, "Jvn": 0 },
+        { "subject": "AC", "Nvd": 2, "Jvn": 2 },
+        { "subject": "Au", "Nvd": 1, "Jvn": 2 },
+        { "subject": "C", "Nvd": 1, "Jvn": 2 },
+        { "subject": "I", "Nvd": 2, "Jvn": 1 },
+        { "subject": "A", "Nvd": 1, "Jvn": 1
+      ],
+      "comment": [
+        {
+          "comment": "24日に更新予定",
+          "author": "Leonor",
+          "data": "2017/08/11"
+        },
+        {
+          "comment": "締め切りを31日に決定",
+          "author": "Leonor",
+          "data": "2017/08/01"
+        }
+      ]
+    },
+    {
+      "id": "Aurelia Court",
+      "limitdate": "",
+      "assign": "",
+      "status": 0,
+      "score":[
+        { "subject": "AV", "Nvd": 0, "Jvn": 0 },
+        { "subject": "AC", "Nvd": 2, "Jvn": 2 },
+        { "subject": "Au", "Nvd": 1, "Jvn": 2 },
+        { "subject": "C", "Nvd": 1, "Jvn": 2 },
+        { "subject": "I", "Nvd": 2, "Jvn": 1 },
+        { "subject": "A", "Nvd": 1, "Jvn": 1 }
+      ],
+      "comment": [
+      ]
+    },
+    {
+      "id": "Lenox Road",
+      "limitdate": "2017/09/10",
+      "assign": "Leonor",
+      "status": 1,
+      "cvss":[
+        { "subject": "AV", "Nvd": 0, "Jvn": 0 },
+        { "subject": "AC", "Nvd": 2, "Jvn": 2 },
+        { "subject": "Au", "Nvd": 1, "Jvn": 2 },
+        { "subject": "C", "Nvd": 1, "Jvn": 2 },
+        { "subject": "I", "Nvd": 2, "Jvn": 1 },
+        { "subject": "A", "Nvd": 1, "Jvn": 1 }
+      ],
+      "comment": [
+        {
+          "comment": "締め切りを31日に決定",
+          "author": "Leonor",
+          "data": "2017/08/01"
+        }
+      ]
+    }
+  ]
+}

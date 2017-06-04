@@ -1,0 +1,60 @@
+{
+  "serverid": "Osaka#1",
+  "enviroment": {
+    "E": 1,
+    "RL": 0,
+    "RC": 3,
+    "CDP": 0,
+    "TD": 0,
+    "CR": 1,
+    "IR": 0,
+    "AR": 0
+  },
+  "cve": [
+    {
+      "id": "CVE-2016-7076",
+      "score": 10,
+      "summary": "Apachetrutsにおける脆弱性",
+      "limitdate": "2017/08/31",
+      "assign": "Tanaka",
+      "status": 2,
+      "comment": [
+        {
+          "comment": "24日に更新予定",
+          "author": "Tanaka",
+          "data": "2017/08/11"
+        },
+        {
+          "comment": "締め切りを31日に決定",
+          "author": "Tanaka",
+          "data": "2017/08/01"
+        }
+      ]
+    },
+    {
+      "id": "CVE-2016-2108",
+      "score": 9,
+      "summary": "OpenSSL の crypto/bio/b_print.c の fmtstr 関数におけるサービス運用妨害 (DoS) の脆弱性",
+      "limitdate": ",
+      "assign": ",
+      "status": 0,
+      "comment": [
+      ]
+    },
+    {
+      "id": "CVE-2016-2109",
+      "score": 9,
+      "summary": "libxml2 の xmlNextChar 関数におけるサービス運用妨害 (DoS) の脆弱性",
+      "limitdate": "2017/09/10",
+      "assign": "Tanaka",
+      "status": 1,
+      "comment": [
+        {
+          "comment": "締め切りを31日に決定",
+          "author": "Tanaka",
+          "data": "2017/08/01"
+        }
+      ]
+    }
+  ]
+}

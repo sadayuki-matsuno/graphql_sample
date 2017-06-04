@@ -3,21 +3,15 @@ package main
 // go:generate sqlboiler postgres
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 
+	"./db"
 	"./starwars"
 	"./vuls"
-	"github.com/inconshreveable/log15"
 	_ "github.com/lib/pq"
 	"github.com/neelance/graphql-go"
 	"github.com/neelance/graphql-go/relay"
-	"github.com/spf13/viper"
-	"github.com/vattle/sqlboiler/boil"
 )
 
 var schema *graphql.Schema
@@ -35,26 +29,7 @@ func init() {
 
 func main() {
 
-	if err := prepareViper(); err != nil {
-		log15.Warn("Failed to read viper config file", "method", "main.main", "err", err)
-	}
-	var dsn = fmt.Sprintf(
-		"host=%s user=%s dbname=%s sslmode=%s password=%s",
-		viper.GetString("postgres.host"),
-		viper.GetString("postgres.user"),
-		viper.GetString("postgres.dbname"),
-		viper.GetString("postgres.sslmode"),
-		viper.GetString("postgres.pass"),
-	)
-	log15.Info("check dsn", "method", "main.main", "dsn", dsn)
-	db, err := sql.Open("postgres", dsn)
-	if err != nil {
-		log15.Error("Failed to open database", "err", err)
-
-	}
-	boil.SetDB(db)
-	log15.Info("connectd to db", "dsn", dsn)
-
+	db.OpenDBs()
 	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write(page)
 	}))
@@ -62,33 +37,7 @@ func main() {
 	//	http.Handle("/query", &relay.Handler{Schema: schema})
 	http.Handle("/query", &relay.Handler{Schema: schema2})
 
-	log.Fatal(http.ListenAndServe(":8000", nil))
-}
-
-func prepareViper() error {
-	log15.Info("call prepareViper", "method", "main.prepareViper")
-	viper.SetConfigName("sqlboiler")
-
-	configHome := os.Getenv("XDG_CONFIG_HOME")
-	homePath := os.Getenv("HOME")
-	wd, err := os.Getwd()
-	if err != nil {
-		wd = "./"
-	}
-
-	configPaths := []string{wd}
-	if len(configHome) > 0 {
-		configPaths = append(configPaths, filepath.Join(configHome, "sqlboiler"))
-	} else {
-		configPaths = append(configPaths, filepath.Join(homePath, ".config/sqlboiler"))
-	}
-
-	for _, p := range configPaths {
-		viper.AddConfigPath(p)
-	}
-
-	err = viper.ReadInConfig()
-	return err
+	log.Fatal(http.ListenAndServe(":8888", nil))
 }
 
 var page = []byte(`

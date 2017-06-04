@@ -80,6 +80,7 @@ func MigrateUserDB() error {
 		&models.User{},
 		&models.Auth{},
 		&models.Task{},
+		&models.Comment{},
 	).Error; err != nil {
 		log15.Error("Failed to migrate user db.", "err", err)
 		return err
