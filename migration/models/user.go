@@ -23,11 +23,12 @@ type Group struct {
 
 // User : User
 type User struct {
-	gorm.Model `json:"-" xml:"-"`
-	Name       string
-	Email      string
-	Password   string
-	Auth       []Auth
+	gorm.Model     `json:"-" xml:"-"`
+	OrganizationID string
+	Name           string
+	Email          string
+	Password       string
+	Auth           []Auth
 }
 
 // Auth : Auth
@@ -45,5 +46,12 @@ type Task struct {
 	ServerName     string
 	OrganizationID string
 	Users          []User
-	Comments       string
+	Comments       []Comment
+}
+
+// Comment : Comment
+type Comment struct {
+	gorm.Model `json:"-" xml:"-"`
+	Content    string
+	UserID     string
 }

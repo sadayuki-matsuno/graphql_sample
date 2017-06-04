@@ -1,0 +1,39 @@
+[
+  {
+    "index": 0,
+    "ServerName": "Highland Avenue",
+    "ScanTime": "2017-05-16T01:38:19 -09:00",
+    "Family": "ubuntu",
+    "Packages": "ssh",
+    "High": 3,
+    "Medium": 0,
+    "Low": 0,
+    "assigned": [
+      "Tanaka",
+      "Yamada"
+    ],
+    "role": "Local",
+    "tags": [
+      "nostrud",
+      "consequat"
+    ]
+  },
+  {
+    "index": 1,
+    "ServerName": "Aurelia Court",
+    "ScanTime": "2014-02-06T06:00:23 -09:00",
+    "Family": "centos",
+    "Packages": "wget",
+    "High": 7,
+    "Medium": 3,
+    "Low": 9,
+    "assigned": [
+      "Yamada"
+    ],
+    "role": "Osaka",
+    "tags": [
+      "anim",
+      "veniam"
+    ]
+  }
+]
