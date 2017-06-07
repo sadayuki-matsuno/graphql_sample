@@ -2,13 +2,15 @@ package db
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/go-redis/redis"
 	"github.com/inconshreveable/log15"
-	_ "github.com/lib/pq"
+	cveModels "github.com/kotakanbe/go-cve-dictionary/models"
+	//	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"github.com/vattle/sqlboiler/boil"
 )
@@ -34,14 +36,51 @@ func OpenDBs() (err error) {
 	)
 
 	if err = connectPostgres(postgresURL); err != nil {
-		log15.Error("errmsg", "method", "db.OpenDBs", "err", err)
+		log15.Error("Failed to connect postgres", "method", "db.OpenDBs", "err", err)
 		return err
 	}
 	if err = connectRedis(viper.GetString("redis.url")); err != nil {
-		log15.Error("errmsg", "method", "db.OpenDBs", "err", err)
+		log15.Error("Failed to connect redis", "method", "db.OpenDBs", "err", err)
 		return err
 	}
 	return nil
+}
+
+// GetCveByID : GetCveById
+func GetCveByID(cveID string) (cveDetail *cveModels.CveDetail, err error) {
+	var result *redis.StringStringMapCmd
+	if result = redisClient.HGetAll(cveID); result.Err() != nil {
+		log15.Error("Failed to HGetALL", "method", "db.GetCveByID", "err", result.Err())
+		err = result.Err()
+		return
+	}
+	if len(result.Val()) == 0 {
+		log15.Info("HGetAll no result", "method", "db.GetCveByID")
+		return nil, nil
+	}
+
+	jvn := cveModels.Jvn{}
+	if j, ok := result.Val()["Jvn"]; ok {
+		if err = json.Unmarshal([]byte(j), &jvn); err != nil {
+			log15.Error("Failed to Unmarshal json", "method", "db.GetCveByID", "err", err)
+			return
+		}
+	}
+
+	nvd := cveModels.Nvd{}
+	if j, ok := result.Val()["Nvd"]; ok {
+		if err = json.Unmarshal([]byte(j), &nvd); err != nil {
+			log15.Error("Failed to Unmarshal json", "method", "db.GetCveByID", "err", err)
+			return
+		}
+	}
+
+	cveDetail = &cveModels.CveDetail{
+		CveID: cveID,
+		Nvd:   nvd,
+		Jvn:   jvn,
+	}
+	return
 }
 
 func connectRedis(url string) error {

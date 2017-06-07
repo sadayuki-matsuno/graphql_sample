@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"../models"
 	"github.com/inconshreveable/log15"
+	cveModels "github.com/kotakanbe/go-cve-dictionary/models"
 	graphql "github.com/neelance/graphql-go"
-	"github.com/vattle/sqlboiler/queries/qm"
+	"github.com/sadayuki-matsuno/graphql_sample/db"
 )
 
 var log = log15.New()
@@ -24,31 +24,20 @@ func (r *Resolver) Cves(args *struct{ CveIDs []string }) *[]*CveResolver {
 	uniqueCveIDs := getUniqueSlice(args.CveIDs)
 	log15.Info("Select data from cves", "method", "cve.Cves", "uniqueCveIDs", uniqueCveIDs)
 	for _, id := range uniqueCveIDs {
-		if c, err := models.CveDetailsG(qm.Where("cve_id=?", id)).One(); c != nil {
-			cveResolvers = append(cveResolvers, &CveResolver{c})
-		} else if err != nil {
+		if c, err := db.GetCveByID(id); err != nil {
 			log15.Warn("Failed to select data", "CveID", id, "err", err)
+		} else {
+			cveResolvers = append(cveResolvers, &CveResolver{c})
 		}
 	}
 	log15.Info("Selected data from cves", "method", "cve.Cves", "cveResolvers", cveResolvers)
 	return &cveResolvers
 }
 
-//// Cve : Cve
-//func (r *Resolver) Cve(args *struct{ CveID string }) *CveResolver {
-//	if c, err := models.CveDetailsG(qm.Where("CveID=?", args.CveID)).One(); c != nil {
-//		log15.Info("Selected data from cve", "method", "cve.Cve", "c", c)
-//		return &CveResolver{c}
-//	} else if err != nil {
-//		log15.Warn("Failed to select data", "CveID", args.CveID)
-//	}
-//	return nil
-//}
-
 // CveList : cvesConnection
 func (r *Resolver) CveList(args *CveListArgs) (*CveListResolver, error) {
 
-	log15.Info("Select data from cvelist", "method", "cve.CveList", args.CveIDs, args.CveIDs)
+	log15.Info("Select data from cvelist", "method", "cve.CveList", "args.CveIDs", args.CveIDs)
 	uniqueCveIDs := getUniqueSlice(args.CveIDs)
 	from := 0
 	if args.After != nil {
@@ -71,6 +60,7 @@ func (r *Resolver) CveList(args *CveListArgs) (*CveListResolver, error) {
 		}
 	}
 
+	log15.Info("return CveListResolver", "method", "cve.CveList", "uniqueCveIDs", uniqueCveIDs)
 	return &CveListResolver{
 		cveIDs: uniqueCveIDs,
 		from:   from,
@@ -88,27 +78,27 @@ type CveListResolver struct {
 // CveResolver :
 type CveResolver struct {
 	//	c *cve.CveDetail
-	c *models.CveDetail
+	c *cveModels.CveDetail
 }
 
 // NvdResolver :
 type NvdResolver struct {
-	n *models.NVD
+	n *cveModels.Nvd
 }
 
 // JvnResolver :
 type JvnResolver struct {
-	j *models.JVN
+	j *cveModels.Jvn
 }
 
 // CpeResolver : CpeResolver
 type CpeResolver struct {
-	c *models.Cpe
+	c cveModels.Cpe
 }
 
 // ReferenceResolver : ReferenceResolver
 type ReferenceResolver struct {
-	r *models.Reference
+	r cveModels.Reference
 }
 
 // CveListEdgeResolver : CveListEdgeResolver
@@ -132,303 +122,256 @@ type ListArgs struct {
 
 // CveID : id
 func (r *CveResolver) CveID() string {
-	return r.c.CveID.String
+	return r.c.CveID
 }
 
 // Nvd : Nvd
 func (r *CveResolver) Nvd() *NvdResolver {
-
-	id := &r.c.ID
-	log15.Info("Select data from nvd", "method", "cve.Nvd", "cve_detail_id", id)
-	if n, err := models.NVDSG(qm.Where("cve_detail_id=?", id)).One(); n != nil {
-		return &NvdResolver{n}
-	} else if err != nil {
-		log15.Warn("Failed to select data", "method", "cve.Nvd", "err", err)
-	}
-	return nil
-
+	return &NvdResolver{&r.c.Nvd}
 }
 
 // Jvn : Jvn
 func (r *CveResolver) Jvn() *JvnResolver {
-	id := &r.c.ID
-	log15.Info("Select data from jvn", "method", "cve.Jvn", "cve_detail_id", id)
-	if j, err := models.JVNSG(qm.Where("cve_detail_id=?", id)).One(); j != nil {
-		return &JvnResolver{j}
-	} else if err != nil {
-		log15.Warn("Failed to select data", "method", "cve.Jvn", "err", err)
-	}
-	return nil
+	return &JvnResolver{&r.c.Jvn}
 }
 
-// ID : Summary
-func (r *NvdResolver) ID() int32 {
-	return int32(r.n.ID)
+// ID : ID
+func (r *NvdResolver) ID() string {
+	return "NVD_" + r.n.CveID
 }
 
 // Summary : Summary
 func (r *NvdResolver) Summary() *string {
-	return &r.n.Summary.String
+	return &r.n.Summary
 }
 
 // Score :  Score
 func (r *NvdResolver) Score() *float64 {
-	return &r.n.Score.Float64
+	return &r.n.Score
 }
 
 // AccessVector : AccessVector
 func (r *NvdResolver) AccessVector() *string {
-	return &r.n.AccessVector.String
+	return &r.n.AccessVector
 }
 
 // AccessComplexity : AccessComplexity
 func (r *NvdResolver) AccessComplexity() *string {
-	return &r.n.AccessComplexity.String
+	return &r.n.AccessComplexity
 }
 
 // Authentication : Authentication
 func (r *NvdResolver) Authentication() *string {
-	return &r.n.Authentication.String
+	return &r.n.Authentication
 }
 
 // ConfidentialityImpact : ConfidentialityImpact
 func (r *NvdResolver) ConfidentialityImpact() *string {
-	return &r.n.ConfidentialityImpact.String
+	return &r.n.ConfidentialityImpact
 }
 
 // IntegrityImpact : IntegrityImpact
 func (r *NvdResolver) IntegrityImpact() *string {
-	return &r.n.IntegrityImpact.String
+	return &r.n.IntegrityImpact
 }
 
 // AvailabilityImpact : AvailabilityImpact
 func (r *NvdResolver) AvailabilityImpact() *string {
-	return &r.n.AvailabilityImpact.String
+	return &r.n.AvailabilityImpact
 }
 
 // Cpes  : Nvd
 func (r *NvdResolver) Cpes() *[]*CpeResolver {
 
-	nvdID := &r.n.ID
-	log15.Info("Select data from cpe", "method", "cve.Cpe", "nvd_id", nvdID)
-	if cpes, err := models.CpesG(qm.Where("nvd_id=?", nvdID)).All(); cpes != nil {
-		log15.Info("select multi data", "cpes", cpes)
-		var cpeResolvers []*CpeResolver
-		for _, c := range cpes {
-			cpeResolvers = append(cpeResolvers, &CpeResolver{c})
-		}
-		return &cpeResolvers
-	} else if err != nil {
-		log15.Warn("Failed to select data", "method", "cve.Cpe", "err", err)
+	var cpeResolvers []*CpeResolver
+	for _, cpe := range r.n.Cpes {
+		log15.Info("check cpe", "method", "cve.Cpes", "cpe", cpe)
+		cpeResolvers = append(cpeResolvers, &CpeResolver{cpe})
 	}
-	return nil
-
+	log15.Info("check cpe", "method", "cve.Cpes", "cpeResolvers", cpeResolvers)
+	return &cpeResolvers
 }
 
 // CweID : CweID
 func (r *NvdResolver) CweID() *string {
-	return &r.n.CweID.String
+	return &r.n.CweID
 }
 
 // References  : Nvd
 func (r *NvdResolver) References() *[]*ReferenceResolver {
-
-	nvdID := &r.n.ID
-	log15.Info("Select data from cpe", "method", "cve.Reference", "nvd_id", nvdID)
-	if cpes, err := models.ReferencesG(qm.Where("nvd_id=?", nvdID)).All(); cpes != nil {
-		log15.Info("select multi data", "cpes", cpes)
-		var cpeResolvers []*ReferenceResolver
-		for _, c := range cpes {
-			cpeResolvers = append(cpeResolvers, &ReferenceResolver{c})
-		}
-		return &cpeResolvers
-	} else if err != nil {
-		log15.Warn("Failed to select data", "method", "cve.Reference", "err", err)
+	var referenceResolvers []*ReferenceResolver
+	for _, r := range r.n.References {
+		referenceResolvers = append(referenceResolvers, &ReferenceResolver{r})
 	}
-	return nil
-
+	return &referenceResolvers
 }
 
 // PublishedDate : PublishedDate
 func (r *NvdResolver) PublishedDate() *string {
-	t := r.n.PublishedDate.Time.String()
+	t := r.n.PublishedDate.String()
 	return &t
 }
 
 // LastModifiedDate : LastModifiedDate
 func (r *NvdResolver) LastModifiedDate() *string {
-	t := r.n.LastModifiedDate.Time.String()
+	t := r.n.LastModifiedDate.String()
 	return &t
 }
 
-// ID : Summary
-func (r *JvnResolver) ID() int32 {
-	return int32(r.j.ID)
+// ID : ID
+func (r *JvnResolver) ID() string {
+	return "JVN_" + r.j.CveID
 }
 
 // CveDetailID : Cvedetailid
 func (r *JvnResolver) CveDetailID() *int32 {
-	id := int32(r.j.CveDetailID.Int)
+	id := int32(r.j.CveDetailID)
 	return &id
 }
 
 // Title       : Title
 func (r *JvnResolver) Title() *string {
-	return &r.j.Title.String
+	return &r.j.Title
 }
 
 // Summary     : Summary
 func (r *JvnResolver) Summary() *string {
-	return &r.j.Summary.String
+	return &r.j.Summary
+}
+
+// JVNID : JvnID
+func (r *JvnResolver) JVNID() *string {
+	return &r.j.JvnID
 }
 
 // JVNLink : Jvnlink
 func (r *JvnResolver) JVNLink() *string {
-	return &r.j.JVNLink.String
-}
-
-// JvnID       : Jvnid
-func (r *JvnResolver) JvnID() *string {
-	return &r.j.JVNID.String
+	return &r.j.JvnLink
 }
 
 // Score       : Score
 func (r *JvnResolver) Score() *float64 {
-	return &r.j.Score.Float64
+	return &r.j.Score
 }
 
 // Severity    : Severity
 func (r *JvnResolver) Severity() *string {
-	return &r.j.Severity.String
+	return &r.j.Severity
 }
 
 // Vector      : Vector
 func (r *JvnResolver) Vector() *string {
-	return &r.j.Vector.String
+	return &r.j.Vector
 }
 
 // Cpes  : Cpe
 func (r *JvnResolver) Cpes() *[]*CpeResolver {
 
-	jvnID := &r.j.ID
-	log15.Info("Select data from cpe", "method", "cve.Cpe", "jvn_id", jvnID)
-	if cpes, err := models.CpesG(qm.Where("jvn_id=?", jvnID)).All(); cpes != nil {
-		log15.Info("select multi data", "cpes", cpes)
-		var cpeResolvers []*CpeResolver
-		for _, c := range cpes {
-			cpeResolvers = append(cpeResolvers, &CpeResolver{c})
-		}
-		return &cpeResolvers
-	} else if err != nil {
-		log15.Warn("Failed to select data", "method", "cve.Cpe", "err", err)
+	//	jvnID := &r.j.ID
+	//	log15.Info("Select data from cpe", "method", "cve.Cpe", "jvn_id", jvnID)
+	//	if cpes, err := models.CpesG(qm.Where("jvn_id=?", jvnID)).All(); cpes != nil {
+	//		log15.Info("select multi data", "cpes", cpes)
+	//		var cpeResolvers []*CpeResolver
+	//		for _, c := range cpes {
+	//			cpeResolvers = append(cpeResolvers, &CpeResolver{c})
+	//		}
+	//		return &cpeResolvers
+	//	} else if err != nil {
+	//		log15.Warn("Failed to select data", "method", "cve.Cpe", "err", err)
+	//	}
+	//	return nil
+	var cpeResolvers []*CpeResolver
+	for _, cpe := range r.j.Cpes {
+		cpeResolvers = append(cpeResolvers, &CpeResolver{cpe})
 	}
-	return nil
+	return &cpeResolvers
 
 }
 
 // References  : Jvn
 func (r *JvnResolver) References() *[]*ReferenceResolver {
 
-	jvnID := &r.j.ID
-	log15.Info("Select data from cpe", "method", "cve.Reference", "jvn_id", jvnID)
-	if cpes, err := models.ReferencesG(qm.Where("jvn_id=?", jvnID)).All(); cpes != nil {
-		log15.Info("select multi data", "cpes", cpes)
-		var cpeResolvers []*ReferenceResolver
-		for _, c := range cpes {
-			cpeResolvers = append(cpeResolvers, &ReferenceResolver{c})
-		}
-		return &cpeResolvers
-	} else if err != nil {
-		log15.Warn("Failed to select data", "method", "cve.Reference", "err", err)
+	//	jvnID := &r.j.ID
+	//	log15.Info("Select data from cpe", "method", "cve.Reference", "jvn_id", jvnID)
+	//	if cpes, err := models.ReferencesG(qm.Where("jvn_id=?", jvnID)).All(); cpes != nil {
+	//		log15.Info("select multi data", "cpes", cpes)
+	//		var cpeResolvers []*ReferenceResolver
+	//		for _, c := range cpes {
+	//			cpeResolvers = append(cpeResolvers, &ReferenceResolver{c})
+	//		}
+	//		return &cpeResolvers
+	//	} else if err != nil {
+	//		log15.Warn("Failed to select data", "method", "cve.Reference", "err", err)
+	//	}
+	//	return nil
+	var referenceResolvers []*ReferenceResolver
+	for _, r := range r.j.References {
+		referenceResolvers = append(referenceResolvers, &ReferenceResolver{r})
 	}
-	return nil
+	return &referenceResolvers
 
 }
 
 // PublishedDate : PublishedDate
 func (r *JvnResolver) PublishedDate() *string {
-	t := r.j.PublishedDate.Time.String()
+	t := r.j.PublishedDate.String()
 	return &t
 }
 
 // LastModifiedDate : LastModifiedDate
 func (r *JvnResolver) LastModifiedDate() *string {
-	t := r.j.LastModifiedDate.Time.String()
+	t := r.j.LastModifiedDate.String()
 	return &t
-}
-
-// JvnID : JVNID
-func (r *CpeResolver) JvnID() *int32 {
-	id := int32(r.c.JVNID.Int)
-	return &id
-}
-
-// NvdID : NVDID
-func (r *CpeResolver) NvdID() *int32 {
-	id := int32(r.c.NVDID.Int)
-	return &id
 }
 
 // CpeName : CpeName
 func (r *CpeResolver) CpeName() *string {
-	return &r.c.CpeName.String
+	return &r.c.CpeName
 }
 
 // Part : Part
 func (r *CpeResolver) Part() *string {
-	return &r.c.Part.String
+	return &r.c.Part
 }
 
 // Vendor : Vendor
 func (r *CpeResolver) Vendor() *string {
-	return &r.c.Vendor.String
+	return &r.c.Vendor
 }
 
 // Product : Product
 func (r *CpeResolver) Product() *string {
-	return &r.c.Product.String
+	return &r.c.Product
 }
 
 // Version       : Version
 func (r *CpeResolver) Version() *string {
-	return &r.c.Version.String
+	return &r.c.Version
 }
 
 // VendorUpdate  : VendorUpdate
 func (r *CpeResolver) VendorUpdate() *string {
-	return &r.c.VendorUpdate.String
+	return &r.c.VendorUpdate
 }
 
 // Edition       : Edition
 func (r *CpeResolver) Edition() *string {
-	return &r.c.Edition.String
+	return &r.c.Edition
 }
 
 // Language      : Language
 func (r *CpeResolver) Language() *string {
-	return &r.c.Language.String
-}
-
-// JvnID : JVNID
-func (r *ReferenceResolver) JvnID() *int32 {
-	id := int32(r.r.JVNID.Int)
-	return &id
-}
-
-// NvdID : NVDID
-func (r *ReferenceResolver) NvdID() *int32 {
-	id := int32(r.r.NVDID.Int)
-	return &id
+	return &r.c.Language
 }
 
 // Source : Source
 func (r *ReferenceResolver) Source() *string {
-	return &r.r.Source.String
+	return &r.r.Source
 }
 
 // Link : Link
 func (r *ReferenceResolver) Link() *string {
-	return &r.r.Link.String
+	return &r.r.Link
 }
 
 // TotalCount : totalCount
@@ -464,10 +407,12 @@ func (r *CveListResolver) Cves() *[]*CveResolver {
 }
 
 func resolveCve(cveID string) *CveResolver {
-	if c, err := models.CveDetailsG(qm.Where("cve_id=?", cveID)).One(); c != nil {
-		return &CveResolver{c}
-	} else if err != nil {
+	var err error
+	var c *cveModels.CveDetail
+	if c, err = db.GetCveByID(cveID); err != nil {
 		log15.Warn("Failed to select data", "method", "cve.resolveCve", "CveID", cveID)
+	} else if c != nil {
+		return &CveResolver{c}
 	}
 	return nil
 }

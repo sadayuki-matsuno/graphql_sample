@@ -6,12 +6,12 @@ import (
 	"log"
 	"net/http"
 
-	"./db"
-	"./starwars"
-	"./vuls"
 	_ "github.com/lib/pq"
 	"github.com/neelance/graphql-go"
 	"github.com/neelance/graphql-go/relay"
+	"github.com/sadayuki-matsuno/graphql_sample/db"
+	"github.com/sadayuki-matsuno/graphql_sample/starwars"
+	"github.com/sadayuki-matsuno/graphql_sample/vuls"
 )
 
 var schema *graphql.Schema
@@ -36,7 +36,6 @@ func main() {
 
 	//	http.Handle("/query", &relay.Handler{Schema: schema})
 	http.Handle("/query", &relay.Handler{Schema: schema2})
-
 	log.Fatal(http.ListenAndServe(":8888", nil))
 }
 
