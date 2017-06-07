@@ -1,2 +1,4 @@
 vendor
 graphql_sample
+sqlboiler.toml
+_vendor*

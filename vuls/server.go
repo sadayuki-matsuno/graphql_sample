@@ -7,7 +7,16 @@ import (
 
 var serverData = make(map[graphql.ID]*server)
 
+// ServerSchema : ServerSchema
+var ServerSchema = `
+type Server {
+	id: ID!
+	name: String!
+}
+`
+
 func init() {
+
 	for _, s := range servers {
 		serverData[s.ID] = s
 	}

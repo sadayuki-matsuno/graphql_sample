@@ -72,6 +72,10 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/kotakanbe/go-cve-dictionary"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/go-redis/redis"
 
 [[constraint]]

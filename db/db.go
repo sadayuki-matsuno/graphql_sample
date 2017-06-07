@@ -10,7 +10,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/inconshreveable/log15"
 	cveModels "github.com/kotakanbe/go-cve-dictionary/models"
-	//	_ "github.com/lib/pq"
+	//  _ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"github.com/vattle/sqlboiler/boil"
 )

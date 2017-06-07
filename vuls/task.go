@@ -2,6 +2,21 @@ package vuls
 
 import "github.com/inconshreveable/log15"
 
+// TaskSchema : TaskSchema
+var TaskSchema = `
+type Task {
+	serverName: String!
+	organizationID: String!
+	comments: String
+}
+
+input TaskInput {
+	serverName: String!
+	organizationID: String!
+	comments: String
+}
+`
+
 func init() {
 }
 
