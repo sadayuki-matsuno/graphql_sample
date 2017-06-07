@@ -1,6 +1,7 @@
 package vuls
 
 import (
+	"github.com/inconshreveable/log15"
 	graphql "github.com/neelance/graphql-go"
 )
 
@@ -33,8 +34,9 @@ var servers = []*server{
 	},
 }
 
-// Server : Server
-func (r *Resolver) Server(args *struct{ ID graphql.ID }) *ServerResolver {
+// Servers : Servers
+func (r *Resolver) Servers(args *struct{ ID graphql.ID }) *ServerResolver {
+	log15.Info("message", "method", "vuls.ID", "args.ID", args.ID)
 	if s := serverData[args.ID]; s != nil {
 		return &ServerResolver{s}
 	}
@@ -48,6 +50,7 @@ type ServerResolver struct {
 
 // ID : id
 func (r *ServerResolver) ID() graphql.ID {
+	log15.Info("message", "method", "vuls.ID", "r.s.ID", r.s.ID)
 	return r.s.ID
 }
 

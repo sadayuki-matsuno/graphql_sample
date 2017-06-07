@@ -8,13 +8,14 @@ var Schema = `
 	}
 	# The query type, represents all of the entry points into our object graph
 	type Query {
-		server(id: ID!): Server
+		servers(id: ID!): Server
 		cves(cveIds: [String!]!): [Cve]
 		cveList(cveIds: [String!]!): CveList!
 	}
 	# The mutation type, represents all updates we can make to our data
 	type Mutation {
 		createTask(cveId: String!,userId : String!, task: TaskInput!): Task
+		#scanResult(organizationID: String!,groupID : String!, scanResult: ScanResult!): ScanResult 
 	}
 
 	type Server {
@@ -28,7 +29,7 @@ var Schema = `
 	}
 
 	type Nvd {
-		id: Int!
+		id: String!
 		summary: String
 		score: Float
 		accessVector: String
@@ -46,12 +47,12 @@ var Schema = `
 
     // Jvn is a model of JVN
     type Jvn {
-		id: Int!
+		id: String!
 		cveDetailID: Int
 		title  : String
     	summary: String
     	jvnLink: String
-    	jvnID  : String
+		jvnID  : String
     	score  :  Float
 		severity: String
     	vector  : String
@@ -80,8 +81,6 @@ var Schema = `
 	}
 
 	type Cpe {
-		jvnID		 	:	Int
-		nvdID 		 	:	Int
     	cpeName		 	:	String
     	part         	:	String
     	vendor       	:	String
@@ -93,11 +92,33 @@ var Schema = `
 	}
 
 	type Reference {
-		jvnID		: Int
-		nvdID 		: Int
 		source		: String
 		link  		: String
 	}
+
+	#	type ScanResult {
+	#		ID         : String!
+	#		OrganizationID : String!
+	#		GroupID   : String!
+	#		ScannedAt :String 
+	#		Lang      : String
+	#		ServerName :String
+	#		Family     :String
+	#		Release    :String
+	#		Errors     :[String]
+	#	}
+	#
+	#	input ScanResultInput {
+	#		ID         : String!
+	#		OrganizationID : String!
+	#		GroupID   : String!
+	#		ScannedAt :String 
+	#		Lang      : String
+	#		ServerName :String
+	#		Family     :String
+	#		Release    :String
+	#		Errors     :[String]
+	#	}
 
 	type Task {
 		serverName: String!
