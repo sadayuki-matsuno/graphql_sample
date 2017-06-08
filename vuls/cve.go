@@ -12,6 +12,83 @@ import (
 	"github.com/sadayuki-matsuno/graphql_sample/db"
 )
 
+// CveSchema : CveSchema
+var CveSchema = `
+type Cve {
+	cveId: String!
+	nvd: Nvd
+	jvn: Jvn
+}
+
+type Nvd {
+	id: String!
+	summary: String
+	score: Float
+	accessVector: String
+	accessComplexity: String
+	authentication: String
+	confidentialityImpact: String
+	integrityImpact: String
+	availabilityImpact: String
+	cpes : [Cpe]
+	cweID: String
+	references: [Reference]
+	publishedDate: Time
+    lastModifiedDate: Time
+}
+
+// Jvn is a model of JVN
+type Jvn {
+	id: String!
+	cveDetailID: Int
+	title  : String
+	summary: String
+	jvnLink: String
+	jvnID  : String
+	score  :  Float
+	severity: String
+	vector  : String
+	cpes : [Cpe]
+	publishedDate: Time
+	lastModifiedDate: Time
+}
+
+type CveList {
+	# The total number of friends
+	totalCount: Int!
+	# The edges for each of the character's friends.
+	edges: [CveListEdge]
+	# A list of the friends, as a convenience when edges are not needed.
+	cves: [Cve]
+	# Information for paginating this connection
+	pageInfo: PageInfo!
+}
+
+# An edge object for a character's friends
+type CveListEdge {
+	# A cursor used for pagination
+	cursor: ID!
+	# The character represented by this friendship edge
+	node: Cve
+}
+
+type Cpe {
+	cpeName		 	:	String
+	part         	:	String
+	vendor       	:	String
+	product      	:	String
+	version      	:	String
+	vendorUpdate 	:	String
+	edition      	:	String
+	language     	:	String
+}
+
+type Reference {
+	source		: String
+	link  		: String
+}
+`
+
 var log = log15.New()
 
 func init() {
@@ -207,15 +284,13 @@ func (r *NvdResolver) References() *[]*ReferenceResolver {
 }
 
 // PublishedDate : PublishedDate
-func (r *NvdResolver) PublishedDate() *string {
-	t := r.n.PublishedDate.String()
-	return &t
+func (r *NvdResolver) PublishedDate() *graphql.Time {
+	return &graphql.Time{r.n.PublishedDate}
 }
 
 // LastModifiedDate : LastModifiedDate
-func (r *NvdResolver) LastModifiedDate() *string {
-	t := r.n.LastModifiedDate.String()
-	return &t
+func (r *NvdResolver) LastModifiedDate() *graphql.Time {
+	return &graphql.Time{r.n.LastModifiedDate}
 }
 
 // ID : ID
@@ -313,15 +388,13 @@ func (r *JvnResolver) References() *[]*ReferenceResolver {
 }
 
 // PublishedDate : PublishedDate
-func (r *JvnResolver) PublishedDate() *string {
-	t := r.j.PublishedDate.String()
-	return &t
+func (r *JvnResolver) PublishedDate() *graphql.Time {
+	return &graphql.Time{r.j.PublishedDate}
 }
 
 // LastModifiedDate : LastModifiedDate
-func (r *JvnResolver) LastModifiedDate() *string {
-	t := r.j.LastModifiedDate.String()
-	return &t
+func (r *JvnResolver) LastModifiedDate() *graphql.Time {
+	return &graphql.Time{r.j.LastModifiedDate}
 }
 
 // CpeName : CpeName

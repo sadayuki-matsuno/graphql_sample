@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	_ "github.com/lib/pq"
+	//	_ "github.com/lib/pq"
 	"github.com/neelance/graphql-go"
 	"github.com/neelance/graphql-go/relay"
 	"github.com/sadayuki-matsuno/graphql_sample/db"
